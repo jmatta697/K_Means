@@ -23,23 +23,29 @@ class KMeansAlg:
             new_cent[0] = uniform(self.x_min, self.x_max)
             new_cent[1] = uniform(self.y_min, self.y_max)
             self.centroid_point_list.append(new_cent)
+            self.centroid_point_groups[tuple(new_cent)] = []
         # print(self.centroid_point_list)
+        # initialize point group dictionary with initial centroids
+
         # construct point pairs
         self.data_points = np.array(list(zip(x_data, y_data)))
 
     def run_algorithm(self):
         self._construct_points_groups()
-        print(self.centroid_point_groups)
+        for cent in self.centroid_point_list:
+            print(self.centroid_point_groups[tuple(cent)])
 
     def _construct_points_groups(self):
         for i in range(self.iter):
             for pt in self.data_points:
                 min_dist = maxsize
+                temp_cent = None
                 for cent in self.centroid_point_list:
                     euclidean_dist = two_dimensional_euclidean_distance(pt, cent)
                     if euclidean_dist < min_dist:
                         min_dist = euclidean_dist
-                        self.centroid_point_groups.update({tuple(cent): [].append(pt)})
+                        temp_cent = cent
+                self.centroid_point_groups[tuple(temp_cent)].append(pt)
 
 
 def two_dimensional_euclidean_distance(p1, p2):
