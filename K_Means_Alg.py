@@ -159,7 +159,7 @@ class KMeansAlg:
         self.colors_assigned = True
         plt.xlabel(self.x_axis_graph_label)
         plt.ylabel(self.y_axis_graph_label)
-        plt.title(f'Image Segmentation ({self.x_axis_graph_label} vs. {self.y_axis_graph_label}) [K={self.k}] '
+        plt.title(f'{self.x_axis_graph_label} vs. {self.y_axis_graph_label} [K={self.k}] '
                   f'\n\nITERATION = {self.current_iter}', fontsize=10)
         plt.show()
 
