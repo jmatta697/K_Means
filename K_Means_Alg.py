@@ -27,13 +27,7 @@ class KMeansAlg:
         self.x_axis_graph_label = x_axis
         self.y_axis_graph_label = y_axis
         # get random centroid start points
-        for i in range(k_centroids):
-            new_cent = [0, 0]
-            # calculate random point for x and y based on the min and max range
-            new_cent[0] = uniform(self.x_min, self.x_max)
-            new_cent[1] = uniform(self.y_min, self.y_max)
-            self.centroid_point_list.append(new_cent)
-            self.centroid_point_groups[tuple(new_cent)] = []
+        self._generate_random_init_centroids()
         # print(self.centroid_point_list)
         # initialize point group dictionary with initial centroids
         # construct point pairs
@@ -58,7 +52,6 @@ class KMeansAlg:
                 'k': "black"
             }
             self.color = color_association[color_string[0]]
-            # calculate SSE...
 
         # calculated sum squared error for one cluster - takes centroid point and list of cluster points
         def calculate_sum_squared_error(self):
@@ -69,16 +62,17 @@ class KMeansAlg:
                 self.sum_squared_error = self.sum_squared_error + (dist ** 2)
 
     def run_algorithm(self):
+        # loop through iterations
         for i in range(self.iter):
+            # for printing current iteration to graph
             self.current_iter = i
+            # build dictionary for (cent):[point list]
             self._construct_points_groups()
-            # DEBUG
-            # print(self.centroid_point_groups)
+            # generate and display plot
             self._construct_plot()
-            # print cluster objects...
-            # reassign attributes of cluster objects
             print()
             cluster_obj_index = 0
+            # reassign attributes of cluster objects
             for group in self.centroid_point_groups:
                 self.cluster_objects[cluster_obj_index].centroid_point = group
                 self.cluster_objects[cluster_obj_index].point_list = self.centroid_point_groups.get(group)
@@ -87,17 +81,30 @@ class KMeansAlg:
                       f'point list: {self.cluster_objects[cluster_obj_index].point_list}')
                 cluster_obj_index = cluster_obj_index + 1
             sleep(1)
+            # move centroids
             self._recalculate_centroid_positions()
-        # calculate SSE and add it to cluster object
         print()
+        # calculate SSE and add it to cluster object
         for obj in self.cluster_objects:
             obj.calculate_sum_squared_error()
             print(f'SSE for {obj.color}: {obj.sum_squared_error}')
 
+    def _generate_random_init_centroids(self):
+        for i in range(self.k):
+            new_cent = [0, 0]
+            # calculate random point for x and y based on the min and max range
+            new_cent[0] = uniform(self.x_min, self.x_max)
+            new_cent[1] = uniform(self.y_min, self.y_max)
+            self.centroid_point_list.append(new_cent)
+            self.centroid_point_groups[tuple(new_cent)] = []
+
     def _construct_points_groups(self):
+        # finds the closest points to the centroid and adds them to the point group
+        # go through all points
         for pt in self.data_points:
             min_dist = maxsize
             temp_cent = None
+            # loop through each centroid
             for cent in self.centroid_point_list:
                 euclidean_dist = two_dimensional_euclidean_distance(pt, cent)
                 if euclidean_dist < min_dist:
@@ -140,10 +147,11 @@ class KMeansAlg:
         # iterate through each group
         # i is used to index colors - now set to a max of 15 groups
         i = 0
+        # plot points for one
         for centroid_key in self.centroid_point_groups:
             # set color
             point_color = colors[i]
-            # assign colors to cluster objects here - only do this once
+            # assign colors to cluster objects here - *only do this once*
             # ----
             if not self.colors_assigned:
                 # construct cluster object and add it to the cluster object list
@@ -151,6 +159,7 @@ class KMeansAlg:
                 cluster_obj = self.ClusterObject(point_color, centroid_key, self.centroid_point_groups[centroid_key])
                 self.cluster_objects.append(cluster_obj)
             # ----
+            # plot centroid locations
             for point in self.centroid_point_groups[centroid_key]:
                 plt.plot(point[0], point[1], colors[i], markersize=6, label='_nolegend_')
             i = i + 1
