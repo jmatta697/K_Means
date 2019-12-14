@@ -12,16 +12,16 @@ def main():
     # user can see what the data set looks like
     print(data.head(10))
     # user chooses x and y coordinate attributes (returns strings)
-    x, y = user_choose_x_y_attributes(data)
+    x_name, y_name = user_choose_x_y_attributes(data)
     # gets the chossen data from the attribute columns
-    x_data = data[x]
-    y_data = data[y]
+    x_data = data[x_name]
+    y_data = data[y_name]
     # user chooses K
     k = user_chooses_k()
     # user chooses number of iterations
     iterations = user_chooses_i()
 
-    alg = KMeansAlg(x_data, y_data, k, iterations, x, y)
+    alg = KMeansAlg(x_data, y_data, k, iterations, x_name, y_name)
     alg.run_algorithm()
 
 

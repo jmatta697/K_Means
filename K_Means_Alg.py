@@ -55,11 +55,14 @@ class KMeansAlg:
 
         # calculated sum squared error for one cluster - takes centroid point and list of cluster points
         def calculate_sum_squared_error(self):
+            error_total = 0
             for point in self.point_list:
                 # calculate euclidean distance
                 dist = two_dimensional_euclidean_distance(self.centroid_point, point)
                 # add to error total
-                self.sum_squared_error = self.sum_squared_error + (dist ** 2)
+                error_total = error_total + (dist ** 2)
+            # get average SSE for point list and assign to SSE value
+            self.sum_squared_error = error_total / len(self.point_list)
 
     def run_algorithm(self):
         # loop through iterations
@@ -71,23 +74,14 @@ class KMeansAlg:
             # generate and display plot
             self._construct_plot()
             print()
-            cluster_obj_index = 0
             # reassign attributes of cluster objects
-            for group in self.centroid_point_groups:
-                self.cluster_objects[cluster_obj_index].centroid_point = group
-                self.cluster_objects[cluster_obj_index].point_list = self.centroid_point_groups.get(group)
-                print(f'color: {self.cluster_objects[cluster_obj_index].color} | '
-                      f'cent: {self.cluster_objects[cluster_obj_index].centroid_point} | '
-                      f'point list: {self.cluster_objects[cluster_obj_index].point_list}')
-                cluster_obj_index = cluster_obj_index + 1
+            self._update_point_group_objects()
             sleep(1)
             # move centroids
             self._recalculate_centroid_positions()
         print()
         # calculate SSE and add it to cluster object
-        for obj in self.cluster_objects:
-            obj.calculate_sum_squared_error()
-            print(f'SSE for {obj.color}: {obj.sum_squared_error}')
+        self._calculate_sse_for_all_clusters()
 
     def _generate_random_init_centroids(self):
         for i in range(self.k):
@@ -171,6 +165,21 @@ class KMeansAlg:
         plt.title(f'{self.x_axis_graph_label} vs. {self.y_axis_graph_label} [K={self.k}] '
                   f'\n\nITERATION = {self.current_iter}', fontsize=10)
         plt.show()
+
+    def _update_point_group_objects(self):
+        cluster_obj_index = 0
+        for group in self.centroid_point_groups:
+            self.cluster_objects[cluster_obj_index].centroid_point = group
+            self.cluster_objects[cluster_obj_index].point_list = self.centroid_point_groups.get(group)
+            print(f'color: {self.cluster_objects[cluster_obj_index].color} | '
+                  f'cent: {self.cluster_objects[cluster_obj_index].centroid_point} | '
+                  f'point list: {self.cluster_objects[cluster_obj_index].point_list}')
+            cluster_obj_index = cluster_obj_index + 1
+
+    def _calculate_sse_for_all_clusters(self):
+        for obj in self.cluster_objects:
+            obj.calculate_sum_squared_error()
+            print(f'SSE for {obj.color}: {obj.sum_squared_error}')
 
 
 def two_dimensional_euclidean_distance(p1, p2):
