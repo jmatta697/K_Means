@@ -32,7 +32,7 @@ class KMeansAlg:
         # initialize point group dictionary with initial centroids
         # construct point pairs
         self.data_points = np.array(list(zip(x_data, y_data)))
-        self.colors_assigned = False
+        self.cluster_objs_created = False
 
     # cluster objects to associate color and SSE with cluster data
     class ClusterObject:
@@ -137,34 +137,35 @@ class KMeansAlg:
     def _construct_plot(self):
         # (g)reen(.)style (this means display the point as a dot in green)
         colors = 5 * ["g.", "r.", "c.", "b.", "y.", "m.", "k."]
-        # plot KMeans grouping
-        # iterate through each group
-        # i is used to index colors - now set to a max of 15 groups
+        # i is used to index colors - now set to a max of 35 groups
         i = 0
-        # plot points for one
+        # loop through each centroid in the centroid point groups
         for centroid_key in self.centroid_point_groups:
-            # set color
-            point_color = colors[i]
-            # assign colors to cluster objects here - *only do this once*
-            # ----
-            if not self.colors_assigned:
-                # construct cluster object and add it to the cluster object list
-                # single_dict_item = {self.centroid_point_groups[centroid_key]}
-                cluster_obj = self.ClusterObject(point_color, centroid_key, self.centroid_point_groups[centroid_key])
-                self.cluster_objects.append(cluster_obj)
-            # ----
-            # plot centroid locations
+            # assign colors to cluster objects here - *ONLY DO THIS ON THE FIRST ITERATION*
+            if not self.cluster_objs_created:
+                self.create_cluster_object(colors[i], centroid_key)
+            # plot all points associated with centroid
             for point in self.centroid_point_groups[centroid_key]:
                 plt.plot(point[0], point[1], colors[i], markersize=6, label='_nolegend_')
+            # increment color index
             i = i + 1
+            # plot centroid marker
             plt.plot(centroid_key[0], centroid_key[1], 'k+', markersize=14)
-
-        self.colors_assigned = True
+        # after this function is called in the first iteration, cluster objects will not be created again
+        self.cluster_objs_created = True
+        # create and place graph labels and title
         plt.xlabel(self.x_axis_graph_label)
         plt.ylabel(self.y_axis_graph_label)
         plt.title(f'{self.x_axis_graph_label} vs. {self.y_axis_graph_label} [K={self.k}] '
                   f'\n\nITERATION = {self.current_iter}', fontsize=10)
         plt.show()
+
+    def create_cluster_object(self, color, centrd_key):
+        # construct cluster object and add it to the cluster object list
+        cluster_obj = self.ClusterObject(color_string=color, cluster_centroid=centrd_key,
+                                         point_lst=self.centroid_point_groups[centrd_key])
+        # add new cluster object to cluster object list
+        self.cluster_objects.append(cluster_obj)
 
     def _update_point_group_objects(self):
         cluster_obj_index = 0
