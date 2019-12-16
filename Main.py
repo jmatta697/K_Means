@@ -2,6 +2,7 @@
 # K-Means algorithm
 import pandas as pd
 from K_Means_Alg import KMeansAlg
+import time
 
 
 def main():
@@ -22,7 +23,11 @@ def main():
     iterations = user_chooses_i()
 
     alg = KMeansAlg(x_data, y_data, k, iterations, x_name, y_name)
+    t0 = time.time()
     alg.run_algorithm()
+    t1 = time.time()
+    total_time = t1 - t0
+    print(f'\nTotal time to execute algorithm: {total_time}')
 
 
 def setup_data_set_console_view():
